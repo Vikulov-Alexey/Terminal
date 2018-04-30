@@ -8,6 +8,13 @@
 
 pid_t pid, child_pid;
 
+void text()
+{
+	printf("\nТерминал: ");
+	fflush(stdout);
+	return;
+}
+
 void main()
 {
 	int status;
@@ -16,7 +23,9 @@ void main()
 	char sep[] = " ";
 	while(1)
 	{
-		printf("Терминал: ");
+		(void) signal(SIGINT,text);
+		printf("\nТерминал: ");
+		fflush(stdout);
 		gets(proc);
 		int i = 0; 
 		char *ptr = strtok(proc, sep);
@@ -28,7 +37,9 @@ void main()
 		words[i] = NULL;
 			
 		if (strcmp(words[0], "break") == 0)
+		{
 			exit(0);
+		}
 
 		switch(pid=fork()) 
 		{
@@ -36,15 +47,11 @@ void main()
 				printf("Ошибка");
 				exit(1);
 			case 0:
+				(void) signal(SIGINT,SIG_DFL);
 				execvp(words[0],words);
 			default:
 				child_pid = pid;
 				child_pid = wait(&status);
 		}
 	}
-}
-
-void kill_p(int sign)
-{
-	kill(child_pid,sign);
 }
